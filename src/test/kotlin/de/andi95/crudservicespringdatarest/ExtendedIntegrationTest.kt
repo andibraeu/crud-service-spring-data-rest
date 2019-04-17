@@ -1,5 +1,6 @@
 package de.andi95.crudservicespringdatarest
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,6 +30,28 @@ class ExtendedIntegrationTest(@Autowired val client: WebTestClient,
                 .expectBody()
                 .jsonPath("participants").isEqualTo(numberOfParticipants)
     }
+
+    @Test
+    fun followHalLinks() {
+        val links = client
+                .post().uri("/conferences")
+                .syncBody(dbBootstrap.createConference(600, 600))
+                .exchange()
+                .returnResult(JsonNode::class.java)
+                .responseBody
+                .blockFirst()
+                ?.get("_links")
+
+        // then
+        client.get().uri(links?.get("self")?.get("href")?.asText().toString())
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody()
+                .jsonPath("name")
+                .isEqualTo("conference 600")
+    }
+
 
     private fun `create conference and return location header`(conferenceNumber: Int, numberOfParticipants: Int): String {
         return client.post().uri("/conferences")
