@@ -5,14 +5,14 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 data class Conference(
-        @Id val id:String? = null,
-        val name: String,
-        val participants: Int,
-        val address: Address
+        @Id var id:String? = null,
+        var name: String,
+        var participants: Int,
+        var address: Address
 )
 
 data class Address(
-        val street: String,
-        val zip: String,
-        val city: String
+        var street: String,
+        var zip: String,
+        var city: String
 )

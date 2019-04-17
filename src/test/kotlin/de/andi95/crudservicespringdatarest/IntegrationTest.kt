@@ -50,9 +50,9 @@ class IntegrationTest(@Autowired val client: WebTestClient,
     @Test
     internal fun `update element via put`() {
         val conferenceNumber = 300
+        val locationHeader = `create conference and return location header`(conferenceNumber, 300)
         val numberOfParticipants = 350
         val updatedConference = dbBootstrap.createConference(conferenceNumber, numberOfParticipants)
-        val locationHeader = `create conference and return location header`(conferenceNumber, 300)
         client.put().uri(locationHeader)
                 .syncBody(updatedConference)
                 .exchange()
@@ -69,6 +69,32 @@ class IntegrationTest(@Autowired val client: WebTestClient,
                 .exchange()
                 .expectStatus()
                 .isNoContent
+    }
+
+    @Test
+    internal fun `get 404 when try to read non-existing element`() {
+        client.get().uri("/conferences/i-do-not-exist")
+                .exchange()
+                .expectStatus()
+                .isNotFound
+    }
+
+    @Test
+    internal fun `get 201 when try to update non-existing element`() {
+        val conferenceToUpdate = dbBootstrap.createConference(123, 456)
+        client.put().uri("/conferences/i-do-not-exist-right-now")
+                .syncBody(conferenceToUpdate)
+                .exchange()
+                .expectStatus()
+                .isCreated
+    }
+
+    @Test
+    internal fun `get 404 when try to delete non-existing element`() {
+        client.delete().uri("/conferences/i-do-not-exist")
+                .exchange()
+                .expectStatus()
+                .isNotFound
     }
 
     private fun `create conference and return location header`(conferenceNumber: Int, numberOfParticipants: Int): String {
