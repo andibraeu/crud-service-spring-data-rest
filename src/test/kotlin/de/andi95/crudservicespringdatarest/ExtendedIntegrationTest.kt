@@ -1,6 +1,7 @@
 package de.andi95.crudservicespringdatarest
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,6 +52,21 @@ class ExtendedIntegrationTest(@Autowired val client: WebTestClient,
                 .jsonPath("name")
                 .isEqualTo("conference 600")
     }
+
+    @Test
+    internal fun `read all elements via get from the first page`() {
+        val result = client.get().uri("/conferences")
+                .exchange()
+                .expectStatus()
+                .isOk
+                .returnResult(JsonNode::class.java)
+                .responseBody
+                .blockFirst()
+
+        Assertions.assertThat(result?.get("_embedded")?.get("conferences")?.size()).isEqualTo(20)
+    }
+
+
 
 
     private fun `create conference and return location header`(conferenceNumber: Int, numberOfParticipants: Int): String {
