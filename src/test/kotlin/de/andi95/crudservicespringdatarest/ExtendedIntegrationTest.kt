@@ -32,7 +32,7 @@ class ExtendedIntegrationTest(@Autowired val client: WebTestClient,
     }
 
     @Test
-    fun followHalLinks() {
+    fun `follow hal links`() {
         val links = client
                 .post().uri("/conferences")
                 .syncBody(dbBootstrap.createConference(600, 600))
