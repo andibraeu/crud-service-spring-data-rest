@@ -97,6 +97,46 @@ class IntegrationTest(@Autowired val client: WebTestClient,
                 .isNotFound
     }
 
+    @Test
+    internal fun `get 400 when try to create null conference`() {
+        client.post().uri("/conferences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+    }
+
+    @Test
+    internal fun `get 400 when try to create invalid conference`() {
+        client.post().uri("/conferences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(mapOf("invalid" to "conference"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+    }
+
+    @Test
+    internal fun `get 400 when try to update null conference`() {
+        val locationHeader = `create conference and return location header`(700, 700)
+        client.put().uri(locationHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+    }
+
+    @Test
+    internal fun `get 400 when try to update invalid conference`() {
+        val locationHeader = `create conference and return location header`(700, 700)
+        client.put().uri(locationHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(mapOf("invalid" to "conference"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest
+    }
+
     private fun `create conference and return location header`(conferenceNumber: Int, numberOfParticipants: Int): String {
         return client.post().uri("/conferences")
                 .contentType(MediaType.APPLICATION_JSON)
