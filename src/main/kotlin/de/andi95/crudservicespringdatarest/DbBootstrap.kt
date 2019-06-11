@@ -12,7 +12,7 @@ class DbBootstrap(val conferenceRepository: ConferenceRepository) : ApplicationL
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun onApplicationEvent(p0: ContextRefreshedEvent) {
-        for (count in 1..25) {
+        for (count in 1..50) {
             logger.info("import dataset {}", count)
             val randomNumber = Math.random() * 100 + count
             conferenceRepository.save(createConference(count, randomNumber.roundToInt()))
