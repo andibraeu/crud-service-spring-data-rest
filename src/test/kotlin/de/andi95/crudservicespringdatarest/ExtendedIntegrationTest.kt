@@ -66,9 +66,6 @@ class ExtendedIntegrationTest(@Autowired val client: WebTestClient,
         Assertions.assertThat(result?.get("_embedded")?.get("conferences")?.size()).isEqualTo(20)
     }
 
-
-
-
     private fun `create conference and return location header`(conferenceNumber: Int, numberOfParticipants: Int): String {
         return client.post().uri("/conferences")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,4 +76,45 @@ class ExtendedIntegrationTest(@Autowired val client: WebTestClient,
                 .location
                 .toString()
     }
+
+    @Test
+    internal fun `validator avoids to store invalid conference`() {
+        val conference = dbBootstrap.createConference(100, 100)
+        conference.address = Address("street", "98765", "Berlin")
+        client.post().uri("/conferences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(conference)
+                .exchange()
+                .expectStatus()
+                .is4xxClientError
+                .expectBody()
+                .jsonPath("errors")
+                .exists()
+    }
+
+    @Test
+    internal fun `validator avoids to update invalid conference`() {
+        val conferenceUri = client.post().uri("/conferences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(dbBootstrap.createConference(100, 100))
+                .exchange()
+                .returnResult(Conference::class.java)
+                .responseHeaders
+                .location
+                .toString()
+
+        val conference = dbBootstrap.createConference(100, 100)
+        conference.address = Address("street", "98765", "Berlin")
+
+        client.put().uri(conferenceUri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .syncBody(conference)
+                .exchange()
+                .expectStatus()
+                .is4xxClientError
+                .expectBody()
+                .jsonPath("errors")
+                .exists()
+    }
+
 }
