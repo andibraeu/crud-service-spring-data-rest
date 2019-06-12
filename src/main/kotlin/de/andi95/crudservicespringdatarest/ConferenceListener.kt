@@ -11,6 +11,6 @@ class ConferenceListener {
 
     @HandleBeforeCreate
     fun handleBeforeCreate(conference: Conference) {
-        logger.error("I'm going to create a conference in {}", conference.address.city)
+        logger.info("I'm going to create a conference in {}", conference.address.city)
     }
 }
