@@ -17,4 +17,9 @@ class Configuration : RepositoryRestConfigurer {
     fun conferenceAddressValidator() : ConferenceAddressValidator {
         return ConferenceAddressValidator()
     }
+
+    @Bean
+    fun conferenceEventListener(): ConferenceListener {
+        return ConferenceListener()
+    }
 }
