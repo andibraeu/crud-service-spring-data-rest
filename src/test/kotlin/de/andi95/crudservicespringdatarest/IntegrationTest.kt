@@ -69,6 +69,11 @@ class IntegrationTest(@Autowired val client: WebTestClient,
                 .exchange()
                 .expectStatus()
                 .isNoContent
+
+        client.get().uri(locationHeader)
+                .exchange()
+                .expectStatus()
+                .isNotFound
     }
 
     @Test
